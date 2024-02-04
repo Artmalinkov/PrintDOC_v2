@@ -28,15 +28,17 @@ import os
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
+# Загрузка тестовой книги и получение таблицы внутри
 wb = load_workbook(r'attachments/excel_tpl.xlsx')
 ws = wb.active
 table = ws.tables['Таблица1']
 
-
-table.ref
-
+# Получение списка заголовков. Они находятся в первой строке таблицы
 for cell in ws[table.ref][0]:
-    print(cell.value)
+    print(cell.column)
+
+test_cell = ws.cell(1,1)
+test_cell.row
 
 # TODO Получить индекс элемента в списке и продолжить тут
 for row in ws[table.ref]:
