@@ -1,9 +1,8 @@
 '''
 Основной функционал приложения по автозамене данных в шаблонах Word
 '''
-import os
 from docxtpl import DocxTemplate
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table
 
 TEST_WORKBOOK_PATH = r'attachments/excel_tpl.xlsx'
@@ -26,8 +25,13 @@ def replace_Word_doc():
     doc.save(r"done/generated_docx.docx")
 
 
-# формирование словаря где ключ - название поля таблицы, а значение - номер столбца
-def get_headers(path_to_book: str,  table_name: str, ):
+def get_headers(path_to_book: str, table_name: str):
+    '''
+    Формирование словаря где ключ - название поля таблицы, а значение - номер столбца
+    :param path_to_book: путь к рабочей книге excel
+    :param table_name: наименование таблицы
+    :return: dict_headers - словарь заголовков таблицы
+    '''
     # Загрузка тестовой книги и получение таблицы внутри
     wb = load_workbook(path_to_book)
     ws = wb.active
@@ -40,8 +44,3 @@ def get_headers(path_to_book: str,  table_name: str, ):
 
     return dict_headers
 
-
-
-
-test_dict_headers = get_headers(TEST_WORKBOOK_PATH, TEST_TABLE_NAME)
-test_dict_headers
