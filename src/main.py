@@ -22,44 +22,6 @@ table = ws.tables[TEST_TABLE_NAME]
 # Определяем шаблон Word
 doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
 
-def replace_Word_doc():
-    '''
-    Открытие и редактор шаблона Word. Замена полей в шаблоне Word
-    :return: None
-    '''
-    # TODO проработать передачу пути
-    # TODO проработать передачу словаря значений
-    doc = DocxTemplate(r"attachments/word_tpl.docx")
-    context = {
-        'переменная': 'Название компании'
-    }
-    doc.render(context)
-    doc.save(r"done/generated_docx.docx")
-
-# Поскольку заголовки можно получать напрямую из атрибутов таблицы, словарь заголовков пока не нужен.
-# def get_headers(path_to_book: str, table_name: str):
-#     '''
-#     Формирование словаря где ключ - название поля таблицы, а значение - номер столбца
-#     :param path_to_book: путь к рабочей книге excel
-#     :param table_name: наименование таблицы
-#     :return: dict_headers - словарь заголовков таблицы
-#     '''
-#     # Загрузка тестовой книги и получение таблицы внутри
-#     wb = load_workbook(path_to_book)
-#     ws = wb.active
-#     table = ws.tables[table_name]
-#
-#     # Получение списка заголовков. Они находятся в первой строке таблицы
-#     dict_headers = {}
-#     for cell in ws[table.ref][0]:
-#         dict_headers[cell.value] = cell.column
-#
-#     # TODO Проработать вынесение функционала загрузки рабочей униги отдельно
-#     # TODO Прорпботать формирование этого словаря через атрибут column_names объекта table
-#     # TODO Прорпботать формирование этого словаря через атрибут tableColumns объекта table
-#
-#     return dict_headers
-
 
 def get_neces_row(worksheet, table, index_neces_row: int):
     '''
@@ -90,7 +52,31 @@ def one_render(ws, table, index_neces_row):
     :param index_neces_row: номер нужной строки для замены
     :return: None
     '''
-    context = get_neces_row (ws, table, index_neces_row)
+    context = get_neces_row(ws, table, index_neces_row)
     doc_tpl.render(context)
     doc_tpl.save(DOC_PATH_SAVE)
     # TODO Проработать преобразование формат дат.
+
+# Поскольку заголовки можно получать напрямую из атрибутов таблицы, словарь заголовков пока не нужен.
+# def get_headers(path_to_book: str, table_name: str):
+#     '''
+#     Формирование словаря где ключ - название поля таблицы, а значение - номер столбца
+#     :param path_to_book: путь к рабочей книге excel
+#     :param table_name: наименование таблицы
+#     :return: dict_headers - словарь заголовков таблицы
+#     '''
+#     # Загрузка тестовой книги и получение таблицы внутри
+#     wb = load_workbook(path_to_book)
+#     ws = wb.active
+#     table = ws.tables[table_name]
+#
+#     # Получение списка заголовков. Они находятся в первой строке таблицы
+#     dict_headers = {}
+#     for cell in ws[table.ref][0]:
+#         dict_headers[cell.value] = cell.column
+#
+#     # TODO Проработать вынесение функционала загрузки рабочей униги отдельно
+#     # TODO Прорпботать формирование этого словаря через атрибут column_names объекта table
+#     # TODO Прорпботать формирование этого словаря через атрибут tableColumns объекта table
+#
+#     return dict_headers
