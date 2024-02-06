@@ -4,6 +4,8 @@
 from docxtpl import DocxTemplate
 from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table
+import win32api
+import os
 
 TEST_WORKBOOK_PATH = r'attachments/excel_tpl.xlsx'
 TEST_TABLE_NAME = 'Таблица1'
@@ -71,6 +73,17 @@ def save_doc_with_name(ws, table, index_neces_row):
     changed_doc, context = one_render(ws, table, index_neces_row, doc_tpl)
     doc_name = f"done/{context['Фамилия']}{context['Имя']}.docx"
     changed_doc.save(doc_name)
+
+
+def print_doc(context):
+    '''
+    Функция распечатки документа
+    :param context: словарь нужной строки
+    :return:
+    '''
+    doc_name = f"done/{context['Фамилия']}{context['Имя']}.docx"
+    full_filepath = os.path.abspath(doc_name)
+    win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
 
 # Поскольку заголовки можно получать напрямую из атрибутов таблицы, словарь заголовков пока не нужен.
 # def get_headers(path_to_book: str, table_name: str):
