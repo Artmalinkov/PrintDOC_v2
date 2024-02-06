@@ -44,18 +44,33 @@ def get_neces_row(worksheet, table, index_neces_row: int):
     return dict_neces_row
 
 
-def one_render(ws, table, index_neces_row):
+def one_render(ws, table, index_neces_row, doc_tpl):
     '''
     Функция единичной замены в шаблоне Word и сохранения в новый готовый документ
     :param ws: рабочий лист Excel
     :param table: таблица на листе
     :param index_neces_row: номер нужной строки для замены
-    :return: None
+    :param doc_tpl: шаблон документа Word
+    :return: doc_tpl: изменённый документ Word,
+             contex: словарь нужной строки
     '''
     context = get_neces_row(ws, table, index_neces_row)
     doc_tpl.render(context)
-    doc_tpl.save(DOC_PATH_SAVE)
     # TODO Проработать преобразование формат дат.
+    return doc_tpl, context
+
+
+def save_doc_with_name(ws, table, index_neces_row):
+    '''
+    Функция сохранения измененённого документа
+    :param ws: рабочий лист
+    :param table: страница на листе
+    :param index_neces_row: номер строки в таблице
+    :return:
+    '''
+    changed_doc, context = one_render(ws, table, index_neces_row, doc_tpl)
+    doc_name = f"done/{context['Фамилия']}{context['Имя']}.docx"
+    changed_doc.save(doc_name)
 
 # Поскольку заголовки можно получать напрямую из атрибутов таблицы, словарь заголовков пока не нужен.
 # def get_headers(path_to_book: str, table_name: str):
