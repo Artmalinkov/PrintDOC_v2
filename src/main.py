@@ -7,6 +7,8 @@ from openpyxl.worksheet.table import Table
 
 TEST_WORKBOOK_PATH = r'attachments/excel_tpl.xlsx'
 TEST_TABLE_NAME = 'Таблица1'
+TEST_DOCTPL_PATH = r"attachments/word_tpl.docx"
+DOC_PATH_SAVE = r"done/generated_docx.docx"
 
 # Загружаем рабочую книгу
 wb = load_workbook(TEST_WORKBOOK_PATH)
@@ -17,13 +19,14 @@ ws = wb.active
 # Определяем тяблицу
 table = ws.tables[TEST_TABLE_NAME]
 
+# Определяем шаблон Word
+doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
 
-# Открытие и редактор шаблона Word
 def replace_Word_doc():
     '''
-        Замена полей в шаблоне Word
-        :return: None
-        '''
+    Открытие и редактор шаблона Word. Замена полей в шаблоне Word
+    :return: None
+    '''
     # TODO проработать передачу пути
     # TODO проработать передачу словаря значений
     doc = DocxTemplate(r"attachments/word_tpl.docx")
@@ -77,3 +80,17 @@ def get_neces_row(worksheet, table, index_neces_row: int):
         dict_neces_row[table.column_names[cell.column - 1]] = cell.value
 
     return dict_neces_row
+
+
+def one_render(ws, table, index_neces_row):
+    '''
+    Функция единичной замены в шаблоне Word и сохранения в новый готовый документ
+    :param ws: рабочий лист Excel
+    :param table: таблица на листе
+    :param index_neces_row: номер нужной строки для замены
+    :return: None
+    '''
+    context = get_neces_row (ws, table, index_neces_row)
+    doc_tpl.render(context)
+    doc_tpl.save(DOC_PATH_SAVE)
+    # TODO Проработать преобразование формат дат.
