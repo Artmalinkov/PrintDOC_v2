@@ -1,21 +1,22 @@
 '''
 Основной функционал приложения по автозамене данных в шаблонах Word
 '''
-from docxtpl import DocxTemplate
-from openpyxl import load_workbook
-from openpyxl.worksheet.table import Table
 import win32api
 import os
 import datetime
+from docxtpl import DocxTemplate
+from openpyxl import load_workbook
+from openpyxl.worksheet.table import Table
+
 
 # Путь к рабочему файлу Excel
-TEST_WORKBOOK_PATH = r'attachments/excel_tpl.xlsx'
+TEST_WORKBOOK_PATH = r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx'
 
 # Наименование таблицы на рабочем листе
 TEST_TABLE_NAME = 'Таблица1'
 
 # Путь к рабочему шаблону Word
-TEST_DOCTPL_PATH = r"attachments/word_tpl.docx"
+TEST_DOCTPL_PATH = r"C:\PythonProjects\Print_AS\attachments\word_tpl.docx"
 
 # Путь по которуму нужно сохранять преобразованный файл Word
 # TODO убрать, поскольку именование происходит по Фамилии и имени
@@ -36,6 +37,9 @@ table = ws.tables[TEST_TABLE_NAME]
 # Определяем шаблон Word
 doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
 
+# Столбец по которому определяется необходимость печати документа
+flag_column_name = 'Печать'
+
 # Необходимость выполнения распечатывания документов
 NEED_PRINT = False
 
@@ -55,7 +59,12 @@ def get_neces_row(worksheet, table, index_neces_row: int):
     # cell.column - индекс столбца ячейки
     # cell.column - индекс столбца ячейки
     # cell.value - значение ячейки
+
     for cell in worksheet[table.ref][index_neces_row]:
+        # Преобразование даты
+        if type(cell.value) == datetime.datetime:
+            cell.value = cell.value.strftime('%d.%m.%Y')
+
         dict_neces_row[table.column_names[cell.column - 1]] = cell.value
 
     return dict_neces_row
@@ -84,7 +93,7 @@ def save_doc_with_name(changed_doc, context):
     :param context: словарь нужной строки
     :return:
     '''
-    doc_name = f"done/{context['Фамилия']}{context['Имя']}.docx"
+    doc_name = f"C:\PythonProjects\Print_AS\done\{context['Фамилия']}{context['Имя']}.docx"
     changed_doc.save(doc_name)
 
 
@@ -99,9 +108,10 @@ def print_doc(context):
     win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
 
 
-def get_column_id(flag_column_name: str) -> int:
+def get_column_id(table, flag_column_name: str) -> int:
     '''
     Функция поиска номера столбца по заданному заголовку
+    :param table: объект таблицы на рабочем листе
     :param flag_column_name: заголовок столбца
     :return: номер столбца
     '''
@@ -111,22 +121,22 @@ def get_column_id(flag_column_name: str) -> int:
     return flag_column_id
 
 
-def total_print_doc():
+def total_print_doc(worksheet, table, doc_tpl, flag_column_name):
     '''
     Сохранение и распечатка каждого документа, отмеченного флагом 'Печать'
     :return:
     '''
     # Определяем, в каком по счёту столбце находится заголовок с именем flag_column_name
-    flag_column = get_column_id('Печать')
+    flag_column = get_column_id(table, flag_column_name)
 
     # Определяем где в столбце flag_column_name стоит '1' - с этой строкой нужно работать.
-    for row in ws[table.ref]:
+    for row in worksheet[table.ref]:
         if row[flag_column - 1].value == 1:
             # Определяем номер строки
             index_neces_row = row[flag_column - 1].row - 1
 
             # Запускаем процедуру замены
-            changed_doc, context = one_render(ws, table, index_neces_row, doc_tpl)
+            changed_doc, context = one_render(worksheet, table, index_neces_row, doc_tpl)
 
             # Сохраняем полученные результаты в файл
             save_doc_with_name(changed_doc, context)
@@ -137,7 +147,7 @@ def total_print_doc():
 
 
 def main():
-    pass
+    total_print_doc(ws, table, doc_tpl, flag_column_name)
 
 
 if __name__ == '__main__':
