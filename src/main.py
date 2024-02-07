@@ -73,15 +73,13 @@ def one_render(ws, table, index_neces_row, doc_tpl):
     return doc_tpl, context
 
 
-def save_doc_with_name(ws, table, index_neces_row):
+def save_doc_with_name(changed_doc, context):
     '''
     Функция сохранения измененённого документа
-    :param ws: рабочий лист
-    :param table: страница на листе
-    :param index_neces_row: номер строки в таблице
+    :param changed_doc: изменённый документ
+    :param context: словарь нужной строки
     :return:
     '''
-    changed_doc, context = one_render(ws, table, index_neces_row, doc_tpl)
     doc_name = f"done/{context['Фамилия']}{context['Имя']}.docx"
     changed_doc.save(doc_name)
 
@@ -109,6 +107,30 @@ def get_column_id(flag_column_name: str) -> int:
     return flag_column_id
 
 
+def total_print_doc():
+    '''
+    Сохранение и распечатка каждого документа, отмеченного флагом 'Печать'
+    :return:
+    '''
+    # Определяем, в каком по счёту столбце находится заголовок с именем flag_column_name
+    flag_column = get_column_id('Печать')
+
+    # Определяем где в столбце flag_column_name стоит '1' - с этой строкой нужно работать.
+    for row in ws[table.ref]:
+        if row[flag_column - 1].value == 1:
+            # Определяем номер строки
+            index_neces_row = row[flag_column - 1].row - 1
+
+            # Запускаем процедуру замены
+            changed_doc, context = one_render(ws, table, index_neces_row, doc_tpl)
+
+            # Сохраняем полученные результаты в файл
+            save_doc_with_name(changed_doc, context)
+
+            # Распечатываем полученный файл
+            print_doc(context)
+
+
 def main():
     pass
 
@@ -116,26 +138,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-# Поскольку заголовки можно получать напрямую из атрибутов таблицы, словарь заголовков пока не нужен.
-# def get_headers(path_to_book: str, table_name: str):
-#     '''
-#     Формирование словаря где ключ - название поля таблицы, а значение - номер столбца
-#     :param path_to_book: путь к рабочей книге excel
-#     :param table_name: наименование таблицы
-#     :return: dict_headers - словарь заголовков таблицы
-#     '''
-#     # Загрузка тестовой книги и получение таблицы внутри
-#     wb = load_workbook(path_to_book)
-#     ws = wb.active
-#     table = ws.tables[table_name]
-#
-#     # Получение списка заголовков. Они находятся в первой строке таблицы
-#     dict_headers = {}
-#     for cell in ws[table.ref][0]:
-#         dict_headers[cell.value] = cell.column
-#
-#     # TODO Проработать вынесение функционала загрузки рабочей униги отдельно
-#     # TODO Прорпботать формирование этого словаря через атрибут column_names объекта table
-#     # TODO Прорпботать формирование этого словаря через атрибут tableColumns объекта table
-#
-#     return dict_headers
