@@ -8,7 +8,6 @@ from docxtpl import DocxTemplate
 from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table
 
-
 # Путь к рабочему файлу Excel
 TEST_WORKBOOK_PATH = r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx'
 
@@ -18,11 +17,7 @@ TEST_TABLE_NAME = 'Таблица1'
 # Путь к рабочему шаблону Word
 TEST_DOCTPL_PATH = r"C:\PythonProjects\Print_AS\attachments\word_tpl.docx"
 
-# Путь по которуму нужно сохранять преобразованный файл Word
-# TODO убрать, поскольку именование происходит по Фамилии и имени
-DOC_PATH_SAVE = r"done/generated_docx.docx"
-
-# Наименование столбца, по которому отслеживается печать
+# Столбец по которому определяется необходимость печати документа
 FLAG_COLUMN_NAME = 'Печать'
 
 # Загружаем рабочую книгу
@@ -37,11 +32,11 @@ table = ws.tables[TEST_TABLE_NAME]
 # Определяем шаблон Word
 doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
 
-# Столбец по которому определяется необходимость печати документа
-flag_column_name = 'Печать'
-
 # Необходимость выполнения распечатывания документов
 NEED_PRINT = False
+
+# Необходимость сохранения изменённого документа Word в файл
+NEED_SAVE = True
 
 
 def get_neces_row(worksheet, table, index_neces_row: int):
@@ -108,17 +103,17 @@ def print_doc(context):
     win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
 
 
-def get_column_id(table, flag_column_name: str) -> int:
+def get_column_id(table, header_name: str) -> int:
     '''
     Функция поиска номера столбца по заданному заголовку
     :param table: объект таблицы на рабочем листе
-    :param flag_column_name: заголовок столбца
+    :param header_name: заголовок столбца
     :return: номер столбца
     '''
     for header in table.tableColumns:
-        if header.name == flag_column_name:
-            flag_column_id = header.id
-    return flag_column_id
+        if header.name == header_name:
+            column_id = header.id
+    return column_id
 
 
 def total_print_doc(worksheet, table, doc_tpl, flag_column_name):
@@ -126,28 +121,45 @@ def total_print_doc(worksheet, table, doc_tpl, flag_column_name):
     Сохранение и распечатка каждого документа, отмеченного флагом 'Печать'
     :return:
     '''
+
     # Определяем, в каком по счёту столбце находится заголовок с именем flag_column_name
     flag_column = get_column_id(table, flag_column_name)
 
     # Определяем где в столбце flag_column_name стоит '1' - с этой строкой нужно работать.
     for row in worksheet[table.ref]:
-        if row[flag_column - 1].value == 1:
-            # Определяем номер строки
-            index_neces_row = row[flag_column - 1].row - 1
-
+        index_neces_row = get_index_neces_row(flag_column, row)
+        if index_neces_row != None:
             # Запускаем процедуру замены
             changed_doc, context = one_render(worksheet, table, index_neces_row, doc_tpl)
 
-            # Сохраняем полученные результаты в файл
-            save_doc_with_name(changed_doc, context)
+            # Если необходимо сохранить - сохраняем полученные результаты в файл
+            if NEED_SAVE == True:
+                save_doc_with_name(changed_doc, context)
 
-            # При необходимости распечатываем полученный файл
+            # Если необходимо распечатать - распечатываем полученный файл
             if NEED_PRINT == True:
                 print_doc(context)
 
 
+def get_index_neces_row(flag_column, row, mark=1):
+    '''
+    Функция определяет номер нужной строки по ячейке, в которой содержится mark
+    :param flag_column: номер столбца с нужными ячейками
+    :param row: объект исследуемой строки
+    :param mark: значение, которое нужно отследить, по умолчанию 1
+    :return: index_neces_row
+    '''
+    if row[flag_column - 1].value == mark:
+        # Определяем номер строки
+        index_neces_row = row[flag_column - 1].row - 1
+    else:
+        index_neces_row = None
+
+    return index_neces_row
+
+
 def main():
-    total_print_doc(ws, table, doc_tpl, flag_column_name)
+    total_print_doc(ws, table, doc_tpl, FLAG_COLUMN_NAME)
 
 
 if __name__ == '__main__':
