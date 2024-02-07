@@ -7,10 +7,21 @@ from openpyxl.worksheet.table import Table
 import win32api
 import os
 
+# Путь к рабочему файлу Excel
 TEST_WORKBOOK_PATH = r'attachments/excel_tpl.xlsx'
+
+# Наименование таблицы на рабочем листе
 TEST_TABLE_NAME = 'Таблица1'
+
+# Путь к рабочему шаблону Word
 TEST_DOCTPL_PATH = r"attachments/word_tpl.docx"
+
+# Путь по которуму нужно сохранять преобразованный файл Word
+# TODO убрать, поскольку именование происходит по Фамилии и имени
 DOC_PATH_SAVE = r"done/generated_docx.docx"
+
+# Наименование столбца, по которому отслеживается печать
+FLAG_COLUMN_NAME = 'Печать'
 
 # Загружаем рабочую книгу
 wb = load_workbook(TEST_WORKBOOK_PATH)
@@ -84,6 +95,26 @@ def print_doc(context):
     doc_name = f"done/{context['Фамилия']}{context['Имя']}.docx"
     full_filepath = os.path.abspath(doc_name)
     win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
+
+
+def get_column_id(flag_column_name: str) -> int:
+    '''
+    Функция поиска номера столбца по заданному заголовку
+    :param flag_column_name: заголовок столбца
+    :return: номер столбца
+    '''
+    for header in table.tableColumns:
+        if header.name == flag_column_name:
+            flag_column_id = header.id
+    return flag_column_id
+
+
+def main():
+    pass
+
+
+if __name__ == '__main__':
+    main()
 
 # Поскольку заголовки можно получать напрямую из атрибутов таблицы, словарь заголовков пока не нужен.
 # def get_headers(path_to_book: str, table_name: str):
