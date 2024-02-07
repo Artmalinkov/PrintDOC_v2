@@ -6,6 +6,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table
 import win32api
 import os
+import datetime
 
 # Путь к рабочему файлу Excel
 TEST_WORKBOOK_PATH = r'attachments/excel_tpl.xlsx'
@@ -34,6 +35,9 @@ table = ws.tables[TEST_TABLE_NAME]
 
 # Определяем шаблон Word
 doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
+
+# Необходимость выполнения распечатывания документов
+NEED_PRINT = False
 
 
 def get_neces_row(worksheet, table, index_neces_row: int):
@@ -127,8 +131,9 @@ def total_print_doc():
             # Сохраняем полученные результаты в файл
             save_doc_with_name(changed_doc, context)
 
-            # Распечатываем полученный файл
-            print_doc(context)
+            # При необходимости распечатываем полученный файл
+            if NEED_PRINT == True:
+                print_doc(context)
 
 
 def main():
@@ -137,4 +142,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
