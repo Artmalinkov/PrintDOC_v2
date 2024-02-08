@@ -3,30 +3,30 @@ from src.main import *
 import datetime
 import src.main
 
+#
+#
+# row = ws[table.ref][0]
+# row[4].value
+# for row in ws[table.ref]:
+#     if row[4].value == 1:
+#         # Запускается процедура total_print
+#         row[4].value = datetime.datetime.now().strftime('%d.%m.%Y')
+#
+# wb.save(r'C:\PythonProjects\Print_AS\attachments\excel_tpl_TEST.xlsx')
 
 
-row = ws[table.ref][0]
-row[4].value
-for row in ws[table.ref]:
-    if row[4].value == 1:
-        # Запускается процедура total_print
-        row[4].value = datetime.datetime.now().strftime('%d.%m.%Y')
-
-wb.save(r'C:\PythonProjects\Print_AS\attachments\excel_tpl_TEST.xlsx')
 
 
 
-# TODO нужно обернуть это в функцию
-# TODO функция должна заменять значение в конкретной ячейке, тоесть нужны индексы и столбца и строки
-FLAG_COLUMN_NAME = 'Печать'
 
-
-wb = load_workbook(r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx')
-ws = wb.active
-table = ws.tables['Таблица1']
 
 # запускаем процедуру просмотра строк, при соблюдении условий - начинаем действия
 
+
+
+
+for row in ws[table.ref]:
+    context =
 
 row = ws[table.ref][1]
 

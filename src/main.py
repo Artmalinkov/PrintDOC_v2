@@ -1,6 +1,5 @@
 '''
 Основной функционал приложения по автозамене данных в шаблонах Word
-v.2 - пере
 '''
 import win32api
 import os
@@ -147,7 +146,7 @@ def total_print_doc(worksheet, table, doc_tpl, FLAG_COLUMN_NAME):
                 pass
 
 
-def get_index_neces_row(index_neces_column, row=row, mark=1):
+def get_index_neces_row(index_neces_column, row, mark=1):
     '''
     Функция определяет номер нужной строки по ячейке, в которой содержится mark
     :param index_neces_column: номер столбца с нужными ячейками
@@ -162,6 +161,23 @@ def get_index_neces_row(index_neces_column, row=row, mark=1):
         index_neces_row = None
 
     return index_neces_row
+
+
+def get_dict_row(table, row):
+    '''
+    Функция формирования словаря из значений в строке
+    :param table: объект таблицы на рабочем словаре
+    :param row: объект строки в таблице
+    :return: dict_row - сформированный словарь: ключ - заголовок столбца, значение - ячейка
+    '''
+    dict_row = {}
+    for cell in row:
+        # Преобразование даты
+        if type(cell.value) == datetime.datetime:
+            cell.value = cell.value.strftime('%d.%m.%Y')
+        # Наполнение словаря
+        dict_row[table.column_names[cell.column-1]] = cell.value
+    return dict_row
 
 
 def main():
