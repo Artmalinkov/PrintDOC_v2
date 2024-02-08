@@ -1,43 +1,56 @@
-# постановка даты текущей даты вместо флага
+# постановка текущей даты вместо флага
 from src.main import *
 import datetime
+import src.main
+
+
+
+row = ws[table.ref][0]
+row[4].value
+for row in ws[table.ref]:
+    if row[4].value == 1:
+        # Запускается процедура total_print
+        row[4].value = datetime.datetime.now().strftime('%d.%m.%Y')
+
+wb.save(r'C:\PythonProjects\Print_AS\attachments\excel_tpl_TEST.xlsx')
+
+
+
+# TODO нужно обернуть это в функцию
+# TODO функция должна заменять значение в конкретной ячейке, тоесть нужны индексы и столбца и строки
+FLAG_COLUMN_NAME = 'Печать'
+
+
+wb = load_workbook(r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx')
+ws = wb.active
+table = ws.tables['Таблица1']
+
+# запускаем процедуру просмотра строк, при соблюдении условий - начинаем действия
+
+
+row = ws[table.ref][1]
+
+
+index_neces_column = get_index_neces_column(table, FLAG_COLUMN_NAME)
+row[index_neces_column-1].value
+
+
 
 
 for row in ws[table.ref]:
-    for cell in row:
+    if row[column_id].value == 1:
+        # Запускается процедура total_print
+        row[column_id].value = datetime.datetime.now().strftime('%d.%m.%Y')
 
 
-        if cell.value == 1:
-            cell.value = datetime.datetime.now().strftime('%d.%m.%Y')
-        print(cell.value)
-
-worksheet = ws
-# Перераблотать функцию total_print() для большей универсальности
-def total_print_doc(worksheet, table, doc_tpl, flag_column_name):
+def replace_mark_date(ws, table, column_id):
     '''
-    Сохранение и распечатка каждого документа, отмеченного флагом 'Печать'
+
+    :param ws:
+    :param table:
+    :param column_id:
     :return:
     '''
-
-    # Определяем, в каком по счёту столбце находится заголовок с именем flag_column_name
-    flag_column = get_column_id(table, flag_column_name)
-
-    # Определяем где в столбце flag_column_name стоит '1' - с этой строкой нужно работать.
-    for row in worksheet[table.ref]:
-        index_neces_row = get_index_neces_row(flag_column, row)
-        if index_neces_row != None:
-            # Запускаем процедуру замены
-            changed_doc, context = one_render(worksheet, table, index_neces_row, doc_tpl)
-
-            # Если необходимо сохранить - сохраняем полученные результаты в файл
-            if NEED_SAVE == True:
-                save_doc_with_name(changed_doc, context)
-
-            # Если необходимо распечатать - распечатываем полученный файл
-            if NEED_PRINT == True:
-                print_doc(context)
-
-total_print_doc(ws,table,doc_tpl,FLAG_COLUMN_NAME)
 
 
 

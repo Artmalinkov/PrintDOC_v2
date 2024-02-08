@@ -38,6 +38,25 @@ NEED_PRINT = False
 # Необходимость сохранения изменённого документа Word в файл
 NEED_SAVE = True
 
+# Необходимость замены маркера на сегодняшнюю дату
+NEED_CHANGE_NOW_DATE = True
+
+
+def one_render(ws, table, index_neces_row, doc_tpl):
+    '''
+    Функция единичной замены в шаблоне Word и сохранения в новый готовый документ
+    :param ws: рабочий лист Excel
+    :param table: таблица на листе
+    :param index_neces_row: номер нужной строки для замены
+    :param doc_tpl: шаблон документа Word
+    :return: doc_tpl: изменённый документ Word,
+             contex: словарь нужной строки
+    '''
+    context = get_neces_row(ws, table, index_neces_row)
+    doc_tpl.render(context)
+    # TODO Проработать преобразование формат дат.
+    return doc_tpl, context
+
 
 def get_neces_row(worksheet, table, index_neces_row: int):
     '''
@@ -65,22 +84,6 @@ def get_neces_row(worksheet, table, index_neces_row: int):
     return dict_neces_row
 
 
-def one_render(ws, table, index_neces_row, doc_tpl):
-    '''
-    Функция единичной замены в шаблоне Word и сохранения в новый готовый документ
-    :param ws: рабочий лист Excel
-    :param table: таблица на листе
-    :param index_neces_row: номер нужной строки для замены
-    :param doc_tpl: шаблон документа Word
-    :return: doc_tpl: изменённый документ Word,
-             contex: словарь нужной строки
-    '''
-    context = get_neces_row(ws, table, index_neces_row)
-    doc_tpl.render(context)
-    # TODO Проработать преобразование формат дат.
-    return doc_tpl, context
-
-
 def save_doc_with_name(changed_doc, context):
     '''
     Функция сохранения измененённого документа
@@ -103,7 +106,7 @@ def print_doc(context):
     win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
 
 
-def get_column_id(table, header_name: str) -> int:
+def get_index_neces_column(table, header_name: str) -> int:
     '''
     Функция поиска номера столбца по заданному заголовку
     :param table: объект таблицы на рабочем листе
@@ -112,18 +115,17 @@ def get_column_id(table, header_name: str) -> int:
     '''
     for header in table.tableColumns:
         if header.name == header_name:
-            column_id = header.id
-    return column_id
+            return header.id
 
 
-def total_print_doc(worksheet, table, doc_tpl, flag_column_name):
+def total_print_doc(worksheet, table, doc_tpl, FLAG_COLUMN_NAME):
     '''
     Сохранение и распечатка каждого документа, отмеченного флагом 'Печать'
     :return:
     '''
 
     # Определяем, в каком по счёту столбце находится заголовок с именем flag_column_name
-    flag_column = get_column_id(table, flag_column_name)
+    flag_column = index_neces_column(table, FLAG_COLUMN_NAME)
 
     # Определяем где в столбце flag_column_name стоит '1' - с этой строкой нужно работать.
     for row in worksheet[table.ref]:
@@ -140,18 +142,21 @@ def total_print_doc(worksheet, table, doc_tpl, flag_column_name):
             if NEED_PRINT == True:
                 print_doc(context)
 
+            if NEED_CHANGE_NOW_DATE == True:
+                pass
 
-def get_index_neces_row(flag_column, row, mark=1):
+
+def get_index_neces_row(index_neces_column, row=row, mark=1):
     '''
     Функция определяет номер нужной строки по ячейке, в которой содержится mark
-    :param flag_column: номер столбца с нужными ячейками
+    :param index_neces_column: номер столбца с нужными ячейками
     :param row: объект исследуемой строки
     :param mark: значение, которое нужно отследить, по умолчанию 1
     :return: index_neces_row
     '''
-    if row[flag_column - 1].value == mark:
+    if row[index_neces_column].value == mark:
         # Определяем номер строки
-        index_neces_row = row[flag_column - 1].row - 1
+        index_neces_row = row[index_neces_column].row - 1
     else:
         index_neces_row = None
 
