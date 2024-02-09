@@ -9,7 +9,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table
 
 # Путь к рабочему файлу Excel
-TEST_WORKBOOK_PATH = r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx'
+WORKBOOK_PATH = r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx'
 
 # Наименование таблицы на рабочем листе
 TABLE_NAME = 'Таблица1'
@@ -27,25 +27,28 @@ TEST_DOCTPL_PATH = r"C:\PythonProjects\Print_AS\attachments\word_tpl.docx"
 RESULT_DOC_DIR = r"C:\PythonProjects\Print_AS\done"
 
 # Загружаем рабочую книгу
-wb = load_workbook(TEST_WORKBOOK_PATH)
+wb = load_workbook(WORKBOOK_PATH)
 
 # Определяем лист
 ws = wb.active
 
 # Определяем тяблицу
 table = ws.tables[TABLE_NAME]
-#
+
 # Определяем шаблон Word
 doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
 
 # Необходимость выполнения распечатывания документов
-NEED_PRINT = True
+NEED_PRINT = False
 
 # Необходимость сохранения изменённого документа Word в файл
 NEED_SAVE = True
 
 # Необходимость замены маркера на сегодняшнюю дату
 NEED_CHANGE_NOW_DATE = True
+
+# Необходимость сохранения рабочей книги после манипуляций
+NEED_WB_SAVE = True
 
 
 def get_dict_row(table, row):
@@ -93,6 +96,25 @@ def iteration_row(MARK, ws, table):
                 # Если нужно - распечатываем
                 if NEED_PRINT == True:
                     print_doc(dict_row)
+
+            # Если нужно - заменяем MARK на текущую дату
+            if NEED_CHANGE_NOW_DATE == True:
+                change_now_date(table, row, PRINT_COLUMN_NAME, NEED_WB_SAVE)
+
+
+def change_now_date(table, row, CHANGE_COLUMN_NAME, NEED_WB_SAVE):
+    '''
+    Функция заменяет значение ячейки в строке на текущую дату.
+    :param table: рабочая таблица
+    :param row: исследуемая строка
+    :param CHANGE_COLUMN_NAME: наименование столбца в котором нужно заменить значение
+    :param NEED_WB_SAVE: определяет, нужно ли сохранять рабочую книгу после манипуляций
+    :return:
+    '''
+    index_change_column = table.column_names.index(CHANGE_COLUMN_NAME)
+    row[index_change_column].value = datetime.datetime.now().strftime('%d.%m.%Y')
+    if NEED_WB_SAVE == True:
+        wb.save(WORKBOOK_PATH)
 
 
 def save_doc_with_name(changed_doc, dict_row):
