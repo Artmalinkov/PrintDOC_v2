@@ -11,6 +11,9 @@ from openpyxl.worksheet.table import Table
 # Путь к рабочему файлу Excel
 WORKBOOK_PATH = r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx'
 
+# Наименование рабочего листа
+NAME_WORKSHEET = 'Лист1'
+
 # Наименование таблицы на рабочем листе
 TABLE_NAME = 'Таблица1'
 
@@ -21,22 +24,10 @@ PRINT_COLUMN_NAME = 'Печать'
 MARK = 1
 
 # Путь к рабочему шаблону Word
-TEST_DOCTPL_PATH = r"C:\PythonProjects\Print_AS\attachments\word_tpl.docx"
+DOCTPL_PATH = r"C:\PythonProjects\Print_AS\attachments\word_tpl.docx"
 
 # Путь к папке, в которой будут лежать результаты
 RESULT_DOC_DIR = r"C:\PythonProjects\Print_AS\done"
-
-# Загружаем рабочую книгу
-wb = load_workbook(WORKBOOK_PATH)
-
-# Определяем лист
-ws = wb.active
-
-# Определяем тяблицу
-table = ws.tables[TABLE_NAME]
-
-# Определяем шаблон Word
-doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
 
 # Необходимость выполнения распечатывания документов
 NEED_PRINT = False
@@ -49,6 +40,31 @@ NEED_CHANGE_NOW_DATE = True
 
 # Необходимость сохранения рабочей книги после манипуляций
 NEED_WB_SAVE = True
+
+
+def get_start(WORKBOOK_PATH: str, NAME_WORKSHEET: str, TABLE_NAME: str, TEST_DOCTPL_PATH: str):
+    '''
+    Функция проводит первоначальное определение основных объектов с которыми с последующем будем работать
+    :param WORKBOOK_PATH:
+    :param NAME_WORKSHEET:
+    :param TABLE_NAME:
+    :param TEST_DOCTPL_PATH:
+    :return: wb, ws, table, doc_tpl
+    '''
+
+    # Загружаем рабочую книгу
+    wb = load_workbook(WORKBOOK_PATH)
+
+    # Определение рабочего листа
+    ws = wb[NAME_WORKSHEET]
+
+    # Определяем тяблицу
+    table = ws.tables[TABLE_NAME]
+
+    # Определяем шаблон Word
+    doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
+
+    return wb, ws, table, doc_tpl
 
 
 def get_dict_row(table, row):
@@ -68,7 +84,7 @@ def get_dict_row(table, row):
     return dict_row
 
 
-def iteration_row(MARK, ws, table):
+def iteration_row(wb, ws, table, doc_tpl, MARK):
     '''
     Функция просмотра строк на рабочем листе в таблице.
     :param MARK: маркер по котороку определяется необходимость печати
@@ -102,9 +118,10 @@ def iteration_row(MARK, ws, table):
                 change_now_date(table, row, PRINT_COLUMN_NAME, NEED_WB_SAVE)
 
 
-def change_now_date(table, row, CHANGE_COLUMN_NAME, NEED_WB_SAVE):
+def change_now_date(wb, table, row, CHANGE_COLUMN_NAME, NEED_WB_SAVE):
     '''
     Функция заменяет значение ячейки в строке на текущую дату.
+    :param wb: рабочая книга
     :param table: рабочая таблица
     :param row: исследуемая строка
     :param CHANGE_COLUMN_NAME: наименование столбца в котором нужно заменить значение
@@ -152,8 +169,8 @@ def print_doc(dict_row):
 
 
 def main():
-    iteration_row(MARK, ws, table)
-    pass
+    wb, ws, table, doc_tpl = get_start(WORKBOOK_PATH, NAME_WORKSHEET, TABLE_NAME, DOCTPL_PATH)
+    iteration_row(wb, ws, table, doc_tpl, MARK)
 
 
 if __name__ == '__main__':
