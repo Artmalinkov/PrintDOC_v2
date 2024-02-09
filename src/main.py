@@ -39,134 +39,13 @@ table = ws.tables[TABLE_NAME]
 doc_tpl = DocxTemplate(TEST_DOCTPL_PATH)
 
 # Необходимость выполнения распечатывания документов
-NEED_PRINT = False
+NEED_PRINT = True
 
 # Необходимость сохранения изменённого документа Word в файл
 NEED_SAVE = True
 
 # Необходимость замены маркера на сегодняшнюю дату
 NEED_CHANGE_NOW_DATE = True
-
-
-# def one_render(ws, table, index_neces_row, doc_tpl):
-#     '''
-#     Функция единичной замены в шаблоне Word и сохранения в новый готовый документ
-#     :param ws: рабочий лист Excel
-#     :param table: таблица на листе
-#     :param index_neces_row: номер нужной строки для замены
-#     :param doc_tpl: шаблон документа Word
-#     :return: doc_tpl: изменённый документ Word,
-#              contex: словарь нужной строки
-#     '''
-#     context = get_neces_row(ws, table, index_neces_row)
-#     doc_tpl.render(context)
-#     # TODO Проработать преобразование формат дат.
-#     return doc_tpl, context
-#
-#
-# def get_neces_row(worksheet, table, index_neces_row: int):
-#     '''
-#     Формирование словаря, где ключ - название поля таблицы, а значение - ячейка в строке с индексом 'index_neces_row'
-#     :param worksheet: активный лист
-#     :param table: Таблица Excel
-#     :param index_neces_row: индекс нужной строки
-#     :return: словарь нужной строки
-#     '''
-#     # определяем пустрой словарь
-#     dict_neces_row = {}
-#     # table.ref - диапазон умной таблицы
-#     # column_names - список заголовков умной таблицы
-#     # cell.column - индекс столбца ячейки
-#     # cell.column - индекс столбца ячейки
-#     # cell.value - значение ячейки
-#
-#     for cell in worksheet[table.ref][index_neces_row]:
-#         # Преобразование даты
-#         if type(cell.value) == datetime.datetime:
-#             cell.value = cell.value.strftime('%d.%m.%Y')
-#
-#         dict_neces_row[table.column_names[cell.column - 1]] = cell.value
-#
-#     return dict_neces_row
-
-
-def save_doc_with_name(changed_doc, dict_row):
-    '''
-    Функция сохранения измененённого документа
-    :param changed_doc: изменённый документ
-    :param context: словарь нужной строки
-    :return:
-    '''
-    doc_name = RESULT_DOC_DIR + '\\' +  f"{dict_row['Фамилия']}{dict_row['Имя']}.docx"
-    changed_doc.save(doc_name)
-
-
-def print_doc(context):
-    '''
-    Функция распечатки документа
-    :param context: словарь нужной строки
-    :return:
-    '''
-    doc_name = f"done/{context['Фамилия']}{context['Имя']}.docx"
-    full_filepath = os.path.abspath(doc_name)
-    win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
-
-
-# def get_index_neces_column(table, header_name: str) -> int:
-#     '''
-#     Функция поиска номера столбца по заданному заголовку
-#     :param table: объект таблицы на рабочем листе
-#     :param header_name: заголовок столбца
-#     :return: номер столбца
-#     '''
-#     for header in table.tableColumns:
-#         if header.name == header_name:
-#             return header.id
-#
-#
-# def total_print_doc(worksheet, table, doc_tpl, FLAG_COLUMN_NAME):
-#     '''
-#     Сохранение и распечатка каждого документа, отмеченного флагом 'Печать'
-#     :return:
-#     '''
-#
-#     # Определяем, в каком по счёту столбце находится заголовок с именем flag_column_name
-#     flag_column = index_neces_column(table, FLAG_COLUMN_NAME)
-#
-#     # Определяем где в столбце flag_column_name стоит '1' - с этой строкой нужно работать.
-#     for row in worksheet[table.ref]:
-#         index_neces_row = get_index_neces_row(flag_column, row)
-#         if index_neces_row != None:
-#             # Запускаем процедуру замены
-#             changed_doc, context = one_render(worksheet, table, index_neces_row, doc_tpl)
-#
-#             # Если необходимо сохранить - сохраняем полученные результаты в файл
-#             if NEED_SAVE == True:
-#                 save_doc_with_name(changed_doc, context)
-#
-#             # Если необходимо распечатать - распечатываем полученный файл
-#             if NEED_PRINT == True:
-#                 print_doc(context)
-#
-#             if NEED_CHANGE_NOW_DATE == True:
-#                 pass
-#
-#
-# def get_index_neces_row(index_neces_column, row, mark=1):
-#     '''
-#     Функция определяет номер нужной строки по ячейке, в которой содержится mark
-#     :param index_neces_column: номер столбца с нужными ячейками
-#     :param row: объект исследуемой строки
-#     :param mark: значение, которое нужно отследить, по умолчанию 1
-#     :return: index_neces_row
-#     '''
-#     if row[index_neces_column].value == mark:
-#         # Определяем номер строки
-#         index_neces_row = row[index_neces_column].row - 1
-#     else:
-#         index_neces_row = None
-#
-#     return index_neces_row
 
 
 def get_dict_row(table, row):
@@ -186,7 +65,72 @@ def get_dict_row(table, row):
     return dict_row
 
 
+def iteration_row(MARK, ws, table):
+    '''
+    Функция просмотра строк на рабочем листе в таблице.
+    :param MARK: маркер по котороку определяется необходимость печати
+    :param ws: рабочий лист
+    :param table: рабочая таблица
+    :return:
+    '''
+
+    # Запускаем процедуру просмотра строк в таблице.
+    for row in ws[table.ref]:
+
+        # Для каждой строки формируем словарь
+        dict_row = get_dict_row(table, row)
+
+        # Если в нужном поле стоит единичка...
+        if dict_row[PRINT_COLUMN_NAME] == MARK:
+
+            # Запускаем процедуру замены
+            doc_tpl.render(dict_row)
+
+            # Если нужно - сохраняем, потом если нужно - распечатываем.
+            if NEED_SAVE == True:
+                save_doc_with_name(doc_tpl, dict_row)
+
+                # Если нужно - распечатываем
+                if NEED_PRINT == True:
+                    print_doc(dict_row)
+
+
+def save_doc_with_name(changed_doc, dict_row):
+    '''
+    Функция сохранения измененённого документа
+    :param changed_doc: изменённый документ
+    :param context: словарь нужной строки
+    :return:
+    '''
+    doc_name = RESULT_DOC_DIR + '\\' + f"{dict_row['Фамилия']}{dict_row['Имя']}.docx"
+    changed_doc.save(doc_name)
+
+
+def print_doc(dict_row):
+    '''
+    Функция распечатки документа
+    :param dict_row: словарь нужной строки
+    :return:
+    '''
+
+    doc_name = f"done/{dict_row['Фамилия']}{dict_row['Имя']}.docx"
+
+    full_filepath = os.path.abspath(doc_name)
+    win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
+
+
+def print_doc(dict_row):
+    '''
+    Функция распечатки документа
+    :param dict_row: словарь нужной строки
+    :return:
+    '''
+    full_filepath = RESULT_DOC_DIR + '\\' + f"{dict_row['Фамилия']}{dict_row['Имя']}.docx"
+    win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
+
+
 def main():
+    iteration_row(MARK, ws, table)
     pass
 
 
