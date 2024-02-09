@@ -115,7 +115,7 @@ def iteration_row(wb, ws, table, doc_tpl, MARK):
 
             # Если нужно - заменяем MARK на текущую дату
             if NEED_CHANGE_NOW_DATE == True:
-                change_now_date(table, row, PRINT_COLUMN_NAME, NEED_WB_SAVE)
+                change_now_date(wb, table, row, PRINT_COLUMN_NAME, NEED_WB_SAVE)
 
 
 def change_now_date(wb, table, row, CHANGE_COLUMN_NAME, NEED_WB_SAVE):
