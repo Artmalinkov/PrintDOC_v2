@@ -7,39 +7,80 @@ import win32api
 from docxtpl import DocxTemplate
 from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table
+import yaml
 
 # Путь к рабочему файлу Excel
-WORKBOOK_PATH = r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx'
+WORKBOOK_PATH = get_config('WORKBOOK_PATH')
 
 # Наименование рабочего листа
-NAME_WORKSHEET = 'Лист1'
+NAME_WORKSHEET = get_config('NAME_WORKSHEET')
 
 # Наименование таблицы на рабочем листе
-TABLE_NAME = 'Таблица1'
+TABLE_NAME = get_config('TABLE_NAME')
 
 # Столбец по которому определяется необходимость печати документа
-PRINT_COLUMN_NAME = 'Печать'
+PRINT_COLUMN_NAME = get_config('PRINT_COLUMN_NAME')
 
 # Маркер по отслеживанию необходимости печати
-MARK = 1
+MARK = get_config('MARK')
 
 # Путь к рабочему шаблону Word
-DOCTPL_PATH = r"C:\PythonProjects\Print_AS\attachments\word_tpl.docx"
+DOCTPL_PATH = get_config('DOCTPL_PATH')
 
 # Путь к папке, в которой будут лежать результаты
-RESULT_DOC_DIR = r"C:\PythonProjects\Print_AS\done"
+RESULT_DOC_DIR = get_config('RESULT_DOC_DIR')
 
 # Необходимость выполнения распечатывания документов
-NEED_PRINT = False
+NEED_PRINT = get_config('NEED_PRINT')
 
 # Необходимость сохранения изменённого документа Word в файл
-NEED_SAVE = True
+NEED_SAVE = get_config('NEED_SAVE')
 
 # Необходимость замены маркера на сегодняшнюю дату
-NEED_CHANGE_NOW_DATE = True
+NEED_CHANGE_NOW_DATE = get_config('NEED_CHANGE_NOW_DATE')
 
 # Необходимость сохранения рабочей книги после манипуляций
-NEED_WB_SAVE = True
+NEED_WB_SAVE = get_config('NEED_WB_SAVE')
+
+
+def get_config(key):
+    '''
+    Функция возвращает значение параметра
+    :param key: наименование ключа
+    :return: value: значение словаря с ключом key
+    '''
+    with open('config.yaml', 'r') as file:
+        tmp_data = yaml.safe_load(file)
+    return tmp_data[key]
+
+
+def set_config(key, new_value):
+    '''
+    Функция устанавливает новое значение в файле конфигурации
+    :param key: значение параметра в файле конфигурации
+    :param new_value: новое значение параметра
+    :return: None
+    '''
+    with open('config.yaml', 'r', encoding='utf-8') as file:
+        tmp_data = yaml.safe_load(file)
+        tmp_data[key] = new_value
+    with open('config.yaml', 'w', encoding='utf-8') as file:
+        yaml.dump(tmp_data, file)
+
+
+def set_config(name_config_file='config.yaml', key, value):
+    '''
+    Функция по внесению изменений в кофигурационный файл.
+    :param name_config_file: наименование конфигурационного файла в проекте
+    :param key: значение параметра
+    :param value: значение параметра
+    :return:
+    '''
+    with open(name_config_file, 'r') as file:
+        temp_data = yaml.safe_load(file)
+    with open(name_config_file, 'w') as file:
+        temp_data[key] = value
+        yaml.dump(temp_data, file)
 
 
 def get_start(WORKBOOK_PATH: str, NAME_WORKSHEET: str, TABLE_NAME: str, TEST_DOCTPL_PATH: str):
