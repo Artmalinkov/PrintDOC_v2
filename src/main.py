@@ -8,40 +8,7 @@ from docxtpl import DocxTemplate
 from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table
 import yaml
-
-# Путь к рабочему файлу Excel
-WORKBOOK_PATH = get_config('WORKBOOK_PATH')
-
-# Наименование рабочего листа
-NAME_WORKSHEET = get_config('NAME_WORKSHEET')
-
-# Наименование таблицы на рабочем листе
-TABLE_NAME = get_config('TABLE_NAME')
-
-# Столбец по которому определяется необходимость печати документа
-PRINT_COLUMN_NAME = get_config('PRINT_COLUMN_NAME')
-
-# Маркер по отслеживанию необходимости печати
-MARK = get_config('MARK')
-
-# Путь к рабочему шаблону Word
-DOCTPL_PATH = get_config('DOCTPL_PATH')
-
-# Путь к папке, в которой будут лежать результаты
-RESULT_DOC_DIR = get_config('RESULT_DOC_DIR')
-
-# Необходимость выполнения распечатывания документов
-NEED_PRINT = get_config('NEED_PRINT')
-
-# Необходимость сохранения изменённого документа Word в файл
-NEED_SAVE = get_config('NEED_SAVE')
-
-# Необходимость замены маркера на сегодняшнюю дату
-NEED_CHANGE_NOW_DATE = get_config('NEED_CHANGE_NOW_DATE')
-
-# Необходимость сохранения рабочей книги после манипуляций
-NEED_WB_SAVE = get_config('NEED_WB_SAVE')
-
+import pyodbc
 
 def get_config(key):
     '''
@@ -66,21 +33,6 @@ def set_config(key, new_value):
         tmp_data[key] = new_value
     with open('config.yaml', 'w', encoding='utf-8') as file:
         yaml.dump(tmp_data, file)
-
-
-def set_config(name_config_file='config.yaml', key, value):
-    '''
-    Функция по внесению изменений в кофигурационный файл.
-    :param name_config_file: наименование конфигурационного файла в проекте
-    :param key: значение параметра
-    :param value: значение параметра
-    :return:
-    '''
-    with open(name_config_file, 'r') as file:
-        temp_data = yaml.safe_load(file)
-    with open(name_config_file, 'w') as file:
-        temp_data[key] = value
-        yaml.dump(temp_data, file)
 
 
 def get_start(WORKBOOK_PATH: str, NAME_WORKSHEET: str, TABLE_NAME: str, TEST_DOCTPL_PATH: str):
@@ -213,6 +165,39 @@ def main():
     wb, ws, table, doc_tpl = get_start(WORKBOOK_PATH, NAME_WORKSHEET, TABLE_NAME, DOCTPL_PATH)
     iteration_row(wb, ws, table, doc_tpl, MARK)
 
+
+# Путь к рабочему файлу Excel
+WORKBOOK_PATH = get_config('WORKBOOK_PATH')
+
+# Наименование рабочего листа
+NAME_WORKSHEET = get_config('NAME_WORKSHEET')
+
+# Наименование таблицы на рабочем листе
+TABLE_NAME = get_config('TABLE_NAME')
+
+# Столбец по которому определяется необходимость печати документа
+PRINT_COLUMN_NAME = get_config('PRINT_COLUMN_NAME')
+
+# Маркер по отслеживанию необходимости печати
+MARK = get_config('MARK')
+
+# Путь к рабочему шаблону Word
+DOCTPL_PATH = get_config('DOCTPL_PATH')
+
+# Путь к папке, в которой будут лежать результаты
+RESULT_DOC_DIR = get_config('RESULT_DOC_DIR')
+
+# Необходимость выполнения распечатывания документов
+NEED_PRINT = get_config('NEED_PRINT')
+
+# Необходимость сохранения изменённого документа Word в файл
+NEED_SAVE = get_config('NEED_SAVE')
+
+# Необходимость замены маркера на сегодняшнюю дату
+NEED_CHANGE_NOW_DATE = get_config('NEED_CHANGE_NOW_DATE')
+
+# Необходимость сохранения рабочей книги после манипуляций
+NEED_WB_SAVE = get_config('NEED_WB_SAVE')
 
 if __name__ == '__main__':
     main()
