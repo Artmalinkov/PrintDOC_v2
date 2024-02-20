@@ -161,6 +161,25 @@ def print_doc(dict_row):
     win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
 
 
+def get_cursor_connect_to_db(filepath_db):
+    '''
+    Функция возвращает объект курсора после подключения к базе данных.
+    :param filepath_db: Путь к базе данных
+    :return: cursor - объект курсора
+    '''
+
+    # Создание подключения к Базе данных
+    driver_db = 'Microsoft Access Driver (*.mdb, *.accdb)'
+    filepath_db = r'C:\PythonProjects\Print_AS\attachments\test_db.accdb'
+    user_db = ''
+    password_db = ''
+    connection_string = f'DRIVER={driver_db};DBQ={filepath_db};UID={user_db};PWD={password_db}'
+    conn = pyodbc.connect(connection_string)
+    # Cоздание курсора
+    cursor = conn.cursor()
+    return cursor
+
+
 def main():
     wb, ws, table, doc_tpl = get_start(WORKBOOK_PATH, NAME_WORKSHEET, TABLE_NAME, DOCTPL_PATH)
     iteration_row(wb, ws, table, doc_tpl, MARK)

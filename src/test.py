@@ -1,7 +1,5 @@
-
 from src.main import *
+import pyodbc
 
-gggh = [
-    'jfjgjfg', 'fkghnmkkghmn', 'kfmgkbkfmgb'
-]
+
 
