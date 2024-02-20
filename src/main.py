@@ -6,9 +6,9 @@ import datetime
 import win32api
 from docxtpl import DocxTemplate
 from openpyxl import load_workbook
-from openpyxl.worksheet.table import Table
 import yaml
 import pyodbc
+
 
 def get_config(key):
     '''
@@ -161,23 +161,23 @@ def print_doc(dict_row):
     win32api.ShellExecute(0, 'print', full_filepath, None, '.', 0)
 
 
-def get_cursor_connect_to_db(filepath_db):
+def connect_to_db():
     '''
     Функция возвращает объект курсора после подключения к базе данных.
     :param filepath_db: Путь к базе данных
-    :return: cursor - объект курсора
+    :return: conn: объект подключения
+             cursor - объект курсора
     '''
-
     # Создание подключения к Базе данных
     driver_db = 'Microsoft Access Driver (*.mdb, *.accdb)'
-    filepath_db = r'C:\PythonProjects\Print_AS\attachments\test_db.accdb'
+    FILEPATH_DB = r'C:\PythonProjects\Print_AS\attachments\test_db.accdb'
     user_db = ''
     password_db = ''
-    connection_string = f'DRIVER={driver_db};DBQ={filepath_db};UID={user_db};PWD={password_db}'
+    connection_string = f'DRIVER={driver_db};DBQ={FILEPATH_DB};UID={user_db};PWD={password_db}'
     conn = pyodbc.connect(connection_string)
     # Cоздание курсора
     cursor = conn.cursor()
-    return cursor
+    return conn, cursor
 
 
 def main():
@@ -217,6 +217,9 @@ NEED_CHANGE_NOW_DATE = get_config('NEED_CHANGE_NOW_DATE')
 
 # Необходимость сохранения рабочей книги после манипуляций
 NEED_WB_SAVE = get_config('NEED_WB_SAVE')
+
+# Путь до базы данных
+#FILEPATH_DB = get_config('FILEPATH_DB')
 
 if __name__ == '__main__':
     main()
