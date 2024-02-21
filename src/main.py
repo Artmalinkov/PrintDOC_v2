@@ -16,7 +16,7 @@ def get_config(key):
     :param key: наименование ключа
     :return: value: значение словаря с ключом key
     '''
-    with open('config.yaml', 'r') as file:
+    with open('config.yaml', 'r', encoding='utf-8') as file:
         tmp_data = yaml.safe_load(file)
     return tmp_data[key]
 
@@ -180,16 +180,32 @@ def connect_to_db():
     return conn, cursor
 
 
-def get_headers(DB_TABLE_NAME):
+def get_headers(cursor, DB_TABLE_NAME):
     '''
     Получение списка заголовков таблицы
     :param table_name: наименование таблицы
+    :param cursor: объект курсора
     :return: headers - список заголовков
     '''
     headers = []
     for row in cursor.columns(DB_TABLE_NAME):
         headers.append(row[3])
     return headers
+
+
+def get_headers_str(cursor, DB_TABLE_NAME):
+    '''
+    Функция возвращает строку заголовков для последующего формирования запроса SQL на добавление данных
+    :param cursor: объект курсора базы данных
+    :param DB_TABLE_NAME: наименование таблицы базы данных
+    :return: headers_str: текстовая строка заголовков в нужном формате
+    '''
+    headers = get_headers(cursor, DB_TABLE_NAME)
+    headers_str = ''
+    for item in headers[1:]:
+        headers_str = headers_str + ', [' + item + ']'
+    headers_str = headers_str[2:]
+    return headers_str
 
 
 def main():

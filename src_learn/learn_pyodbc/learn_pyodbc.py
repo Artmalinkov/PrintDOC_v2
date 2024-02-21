@@ -5,30 +5,19 @@ conn, cursor = connect_to_db()
 
 
 
+headers_str = get_headers_str(cursor, DB_TABLE_NAME)
 
 
-# Формирование единой строки заголовков без первого столбца
-headers_str = ''
-for item in headers[1:]:
-    headers_str = headers_str + ', ['  + item + ']'
-headers_str = headers_str[2:]
 
-headers_str
 
 # Вставка данных в базу данных MS Access
 row = ('Сидоров', 'Сидор', 'Сидорович', '07.07.2010')
-row = ('Петров')
+row = ('Петров', 'Петр', 'Петрович', None)
 
 
 # Строка SQL-запроса
 SQL_str = f'''
-        INSERT INTO {table_name} 
-        ([Фамилия], [Имя], [Отчество], [Дата_рождения])
-        VALUES (?, ?, ?, ?)
-        '''
-
-SQL_str = f'''
-        INSERT INTO {table_name} 
+        INSERT INTO {DB_TABLE_NAME} 
         ({headers_str})
         VALUES (?,?,?,?)
         '''
