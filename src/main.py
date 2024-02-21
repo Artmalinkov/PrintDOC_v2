@@ -230,6 +230,21 @@ def get_SQL_query(cursor, DB_TABLE_NAME):
     return SQL_str
 
 
+def print_table_db(cursor, DB_TABLE_NAME):
+    '''
+    Функция выводит в терминал таблицу базы данных
+    :param cursor: объект курсора базы данных
+    :param DB_TABLE_NAME: наименование таблицы базы данных
+    :return:
+    '''
+
+    # Выборка для проверки результата
+    cursor.execute(f'SELECT * FROM {DB_TABLE_NAME}')
+    # Вывести на экран результаты
+    for row in cursor.fetchall():
+        print(row)
+
+
 def main():
     wb, ws, table, doc_tpl = get_start(WORKBOOK_PATH, NAME_WORKSHEET, TABLE_NAME, DOCTPL_PATH)
     iteration_row(wb, ws, table, doc_tpl, MARK)
