@@ -208,6 +208,28 @@ def get_headers_str(cursor, DB_TABLE_NAME):
     return headers_str
 
 
+def get_SQL_query(cursor, DB_TABLE_NAME):
+    '''
+    Функция возвращает переработанную строку SQL-запроса на основании объекта курсора и наименовании таблицы
+    :param cursor: объект курсора базы данных
+    :param DB_TABLE_NAME: наименование таблицы в базе данных
+    :return: SQL_str - строка запроса
+    '''
+    # Получение списка заголовка в таблице
+    headers = get_headers(cursor, DB_TABLE_NAME)
+
+    # Определение количества вопросительных знаков
+    symb = ('?,' * (len(headers) - 1))[:-1]
+
+    # Формирование строки заголовков в нужном формате
+    headers_str = get_headers_str(cursor, DB_TABLE_NAME)
+
+    # Формирование итоговой строки SQL-запроса
+    SQL_str = f'INSERT INTO {DB_TABLE_NAME} ({headers_str}) VALUES ({symb})'
+
+    return SQL_str
+
+
 def main():
     wb, ws, table, doc_tpl = get_start(WORKBOOK_PATH, NAME_WORKSHEET, TABLE_NAME, DOCTPL_PATH)
     iteration_row(wb, ws, table, doc_tpl, MARK)
