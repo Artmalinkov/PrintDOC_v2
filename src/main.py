@@ -180,6 +180,18 @@ def connect_to_db():
     return conn, cursor
 
 
+def get_headers(DB_TABLE_NAME):
+    '''
+    Получение списка заголовков таблицы
+    :param table_name: наименование таблицы
+    :return: headers - список заголовков
+    '''
+    headers = []
+    for row in cursor.columns(DB_TABLE_NAME):
+        headers.append(row[3])
+    return headers
+
+
 def main():
     wb, ws, table, doc_tpl = get_start(WORKBOOK_PATH, NAME_WORKSHEET, TABLE_NAME, DOCTPL_PATH)
     iteration_row(wb, ws, table, doc_tpl, MARK)
@@ -218,8 +230,11 @@ NEED_CHANGE_NOW_DATE = get_config('NEED_CHANGE_NOW_DATE')
 # Необходимость сохранения рабочей книги после манипуляций
 NEED_WB_SAVE = get_config('NEED_WB_SAVE')
 
+# Наименование таблицы в базе данных
+DB_TABLE_NAME = get_config('DB_TABLE_NAME')
+
 # Путь до базы данных
-#FILEPATH_DB = get_config('FILEPATH_DB')
+# FILEPATH_DB = get_config('FILEPATH_DB')
 
 if __name__ == '__main__':
     main()

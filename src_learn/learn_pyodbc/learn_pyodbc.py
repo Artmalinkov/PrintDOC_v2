@@ -3,20 +3,36 @@ from src.main import *
 # Получение объектов соединения и курсора
 conn, cursor = connect_to_db()
 
-# Получение списка заголовков таблицы
-table_name = 'Физическое_лицо'
-headers = []
-for row in cursor.columns(table_name):
-    headers.append(row[3])
+
+
+
+
+# Формирование единой строки заголовков без первого столбца
+headers_str = ''
+for item in headers[1:]:
+    headers_str = headers_str + ', ['  + item + ']'
+headers_str = headers_str[2:]
+
+headers_str
 
 # Вставка данных в базу данных MS Access
-row = ('Сидоров', 'Сидор', 'Сидорович', '07.07.2009')
+row = ('Сидоров', 'Сидор', 'Сидорович', '07.07.2010')
+row = ('Петров')
+
+
 # Строка SQL-запроса
 SQL_str = f'''
         INSERT INTO {table_name} 
         ([Фамилия], [Имя], [Отчество], [Дата_рождения])
         VALUES (?, ?, ?, ?)
         '''
+
+SQL_str = f'''
+        INSERT INTO {table_name} 
+        ({headers_str})
+        VALUES (?,?,?,?)
+        '''
+
 cursor.execute(SQL_str, row)
 
 # Выборка для проверки результата
