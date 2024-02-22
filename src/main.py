@@ -245,6 +245,19 @@ def print_table_db(cursor, DB_TABLE_NAME):
         print(row)
 
 
+def insert_row_to_db(cursor, DB_TABLE_NAME, row):
+    '''
+    Функция вставки строки в базу данных
+    :param cursor: объект курсора
+    :param DB_TABLE_NAME: наименование таблицы
+    :param row: строка данных
+    :return:
+    '''
+    SQL_str = get_SQL_query(cursor, DB_TABLE_NAME)
+    cursor.execute(SQL_str, row)
+    conn.commit()
+
+
 def main():
     wb, ws, table, doc_tpl = get_start(WORKBOOK_PATH, NAME_WORKSHEET, TABLE_NAME, DOCTPL_PATH)
     iteration_row(wb, ws, table, doc_tpl, MARK)
