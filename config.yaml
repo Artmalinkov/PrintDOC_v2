@@ -1,0 +1,14 @@
+DB_TABLE_NAME: "\u0424\u0438\u0437\u0438\u0447\u0435\u0441\u043A\u043E\u0435_\u043B\
+  \u0438\u0446\u043E"
+DOCTPL_PATH: r"C:\PythonProjects\Print_AS\attachments\word_tpl.docx"
+FILEPATH_DB: r'C:\PythonProjects\Print_AS\attachments\test_db.accdb'
+MARK: 1
+NAME_WORKSHEET: "\u041B\u0438\u0441\u04421"
+NEED_CHANGE_NOW_DATE: true
+NEED_PRINT: true
+NEED_SAVE: true
+NEED_WB_SAVE: true
+PRINT_COLUMN_NAME: "\u041F\u0435\u0447\u0430\u0442\u044C"
+RESULT_DOC_DIR: r"C:\PythonProjects\Print_AS\done"
+TABLE_NAME: "\u0422\u0430\u0431\u043B\u0438\u0446\u04301"
+WORKBOOK_PATH: r'C:\PythonProjects\Print_AS\attachments\excel_tpl.xlsx'
